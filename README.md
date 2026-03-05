@@ -110,9 +110,14 @@ generic message to avoid leaking internals.
 
 ### 202 Accepted and async status tracking
 
-The endpoints return `202 Accepted` rather than `204 No Content` deliberately. The service accepts the message and hands it off to the broker, but has no way of confirming that downstream consumers have fully processed it. `202` reflects this honestly — the work is not complete from the caller's perspective.
+The endpoints return `202 Accepted` rather than `204 No Content` deliberately. The service accepts the message and hands
+it off to the broker, but has no way of confirming that downstream consumers have fully processed it. `202` reflects
+this honestly — the work is not complete from the caller's perspective.
 
-This also opens the door to a full async request-reply pattern. Since a deterministic idempotency UUID is already generated per message, it can be returned to the caller as a correlation ID. A future `GET /status/{id}` endpoint could then allow callers to poll for completion, backed by a status store (e.g. Redis) that the processing pipeline writes to upon success or failure.
+This also opens the door to a full async request-reply pattern. Since a deterministic idempotency UUID is already
+generated per message, it can be returned to the caller as a correlation ID. A future `GET /status/{id}` endpoint could
+then allow callers to poll for completion, backed by a status store (e.g. Redis) that the processing pipeline writes to
+upon success or failure.
 
 ## Scaling
 
@@ -130,6 +135,47 @@ On **AWS with Kubernetes (EKS)** this is straightforward:
 
 The only external coordination point is the message broker downstream — ensure its throughput and partition count can
 accommodate the traffic from multiple replicas publishing in parallel.
+
+## Observability
+
+### Health checks and Actuator
+
+Spring Boot Actuator is included and configured to expose `health`, `info`, and `metrics` endpoints:
+
+| Endpoint                | Purpose                                                   |
+|-------------------------|-----------------------------------------------------------|
+| `GET /actuator/health`  | Liveness / readiness probe for Kubernetes                 |
+| `GET /actuator/metrics` | Micrometer metrics (request counts, latencies, JVM stats) |
+
+On EKS configure the Kubernetes `livenessProbe` and `readinessProbe` to hit `/actuator/health` so the scheduler can
+restart unhealthy pods and withhold traffic from pods that are not yet ready.
+
+### Metrics
+
+Micrometer (bundled with Actuator) exposes metrics out of the box. Key ones to monitor for this service:
+
+- **`http.server.requests`** — request rate, error rate, and p99 latency per endpoint; alert if p99 spikes or error rate
+  rises.
+- **JVM metrics** (`jvm.gc.pause`, `jvm.memory.used`) — validate that ZGC pause times stay sub-millisecond under
+  production load.
+- **Broker publish latency** — once the real `Messenger` is in place, instrument it with a `Timer` to track how long
+  publishing to the broker takes end-to-end.
+
+On AWS the natural sink is **CloudWatch Metrics** via the Micrometer CloudWatch registry. On a self-managed Kubernetes
+cluster **Prometheus + Grafana** is the typical choice.
+
+### Structured logging
+
+Application logs are currently plain text. On EKS logs are shipped to CloudWatch Logs, where plain text is hard to
+query. Switching to structured JSON logging (e.g. via `logstash-logback-encoder`) makes it straightforward to filter by
+`source`, `eventId`, or log level without regex parsing.
+
+### Distributed tracing
+
+If this service is part of a larger system, adding **Micrometer Tracing** (backed by OpenTelemetry) will propagate trace
+IDs across service boundaries. This makes it possible to follow a single provider POST all the way through
+normalisation, broker publish, and downstream consumer processing in a single trace — invaluable when debugging latency
+issues in production.
 
 ## Production considerations
 
@@ -236,8 +282,9 @@ During development I made a few assumptions I'd like to flag:
 [Claude](https://claude.ai) (Anthropic) was used as a development assistant throughout this project. Concretely, it
 helped with:
 
-- **Code generation** — scaffolding boilerplate such as normalizer stubs, the registry, improving and rewording Javadoc,
-  and test structure, which was then reviewed and adjusted.
+- **Code generation** — scaffolding boilerplate such as normalizer stubs, logging, the registry, improving and rewording
+  Javadoc, and test structure, which was then reviewed and adjusted.
+- **Advice** — asked advice related to observability and tracing.
 - **Debugging** — identifying issues such as mismatched `getRawMessageType()` values, and Java record constructor
   ambiguity due to type erasure.
 - **Refactoring** — moving & renaming, extracting.
