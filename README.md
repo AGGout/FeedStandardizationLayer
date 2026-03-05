@@ -257,25 +257,18 @@ The registry picks them up automatically on the next startup.
 During development I made a few assumptions I'd like to flag:
 
 - Event identity — I assumed eventId refers to a sporting event (match), not to the uniqueness of an individual message.
-  A
-  single event  
-  produces multiple messages over its lifetime — repeated odds updates followed by a final settlement — and I treated
-  eventId as the     
-  natural key for grouping and ordering those messages.
+  A single event produces multiple messages over its lifetime — repeated odds updates followed by a final settlement —
+  and I treated
+  eventId as the natural key for grouping and ordering those messages.
 
 - Latency requirements — I assumed the service is time-critical and that feed messages must reach downstream consumers
-  as
-  quickly as
-  possible, since consumers may be acting on live odds. This influenced some technical choices, most notably
-  recommending
-  ZGC as the
-  garbage collector to minimise pause times.
+  as quickly as possible, since consumers may be acting on live odds. This influenced some technical choices, most
+  notably
+  recommending ZGC as the garbage collector to minimise pause times.
 
 - Extensibility — I assumed that new feed providers and message types are likely to be added over time. The architecture
-  was designed
-  around this: adding a new provider or message type requires only a new self-contained class, with no changes to
-  existing
-  code.
+  was designed around this: adding a new provider or message type requires only a new self-contained class, with no
+  changes to existing code.
 
 ## AI assistance
 
