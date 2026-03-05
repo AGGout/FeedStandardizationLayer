@@ -25,9 +25,10 @@ public class BetaOddsChangeNormalizer implements FeedNormalizer {
     }
 
     @Override
-    public String getRawMessageType() {
-        return "ODDS";
-    }
+    public String getRawMessageType() { return "ODDS"; }
+
+    @Override
+    public String getMessageTypeKey() { return "type"; }
 
     @Override
     @SuppressWarnings("unchecked")

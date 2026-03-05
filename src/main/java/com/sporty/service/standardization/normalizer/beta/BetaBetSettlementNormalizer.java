@@ -24,9 +24,10 @@ public class BetaBetSettlementNormalizer implements FeedNormalizer {
     }
 
     @Override
-    public String getRawMessageType() {
-        return "SETTLEMENT";
-    }
+    public String getRawMessageType() { return "SETTLEMENT"; }
+
+    @Override
+    public String getMessageTypeKey() { return "type"; }
 
     @Override
     public NormalizedMessage normalize(Map<String, Object> raw) {

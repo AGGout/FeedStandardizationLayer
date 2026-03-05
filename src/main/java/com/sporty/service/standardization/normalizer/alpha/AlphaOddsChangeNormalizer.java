@@ -19,9 +19,10 @@ public class AlphaOddsChangeNormalizer implements FeedNormalizer {
     }
 
     @Override
-    public String getRawMessageType() {
-        return "odds_update";
-    }
+    public String getRawMessageType() { return "odds_update"; }
+
+    @Override
+    public String getMessageTypeKey() { return "msg_type"; }
 
     @Override
     @SuppressWarnings("unchecked")

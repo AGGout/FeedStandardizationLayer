@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 public class FeedNormalizerRegistry {
 
     private final Map<String, FeedNormalizer> normalizers;
+    private final Map<String, String> messageTypeKeys;
 
     public FeedNormalizerRegistry(List<FeedNormalizer> normalizers) {
         this.normalizers = normalizers.stream()
@@ -18,10 +19,20 @@ public class FeedNormalizerRegistry {
                         n -> key(n.getSource(), n.getRawMessageType()),
                         Function.identity()
                 ));
-    }
 
-    private static String key(String source, String rawMessageType) {
-        return source + ":" + rawMessageType;
+        // One message type key per source — fail fast if a source has conflicting keys
+        this.messageTypeKeys = normalizers.stream()
+                .collect(Collectors.toMap(
+                        FeedNormalizer::getSource,
+                        FeedNormalizer::getMessageTypeKey,
+                        (existing, replacement) -> {
+                            if (!existing.equals(replacement)) {
+                                throw new IllegalStateException(
+                                        "Conflicting message type keys for the same source: '%s' vs '%s'".formatted(existing, replacement));
+                            }
+                            return existing;
+                        }
+                ));
     }
 
     public FeedNormalizer getNormalizer(String source, String rawMessageType) {
@@ -31,5 +42,17 @@ public class FeedNormalizerRegistry {
                     "No normalizer registered for source '%s' and message type '%s'".formatted(source, rawMessageType));
         }
         return normalizer;
+    }
+
+    public String getMessageTypeKey(String source) {
+        String key = messageTypeKeys.get(source);
+        if (key == null) {
+            throw new IllegalArgumentException("No normalizer registered for source: " + source);
+        }
+        return key;
+    }
+
+    private static String key(String source, String rawMessageType) {
+        return source + ":" + rawMessageType;
     }
 }

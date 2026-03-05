@@ -18,6 +18,9 @@ class FeedNormalizerRegistryTest {
             public String getRawMessageType() { return rawMessageType; }
 
             @Override
+            public String getMessageTypeKey() { return "msg_type"; }
+
+            @Override
             public com.sporty.service.standardization.model.NormalizedMessage normalize(java.util.Map<String, Object> msg) {
                 return null;
             }

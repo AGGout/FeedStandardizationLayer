@@ -10,4 +10,6 @@ public interface FeedNormalizer {
     String getSource();
 
     String getRawMessageType();
+
+    String getMessageTypeKey();
 }

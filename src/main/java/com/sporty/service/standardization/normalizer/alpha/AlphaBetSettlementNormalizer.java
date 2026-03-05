@@ -19,9 +19,10 @@ public class AlphaBetSettlementNormalizer implements FeedNormalizer {
     }
 
     @Override
-    public String getRawMessageType() {
-        return "settlement";
-    }
+    public String getRawMessageType() { return "settlement"; }
+
+    @Override
+    public String getMessageTypeKey() { return "msg_type"; }
 
     @Override
     public NormalizedMessage normalize(Map<String, Object> raw) {
