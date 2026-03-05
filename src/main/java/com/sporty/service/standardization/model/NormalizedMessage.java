@@ -1,9 +1,13 @@
 package com.sporty.service.standardization.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@AllArgsConstructor
+@Getter
 public class NormalizedMessage {
-    String Id; // UUID7
     String src;
     String srcId;
     MessageType messageType;
-    Result result;
+    MatchResult matchResult;
 }

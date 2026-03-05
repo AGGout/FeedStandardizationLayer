@@ -1,0 +1,49 @@
+package com.sporty.service.standardization.util;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
+
+public final class Util {
+
+    private Util() {}
+
+    /**
+     * Creates a deterministic UUID version 7 from source, id, and timestamp.
+     * The same (source, id, timestamp) triple always produces the same UUID.
+     *
+     * UUID v7 layout (RFC 9562):
+     *   - bits  0–47:  unix_ts_ms (48 bits)
+     *   - bits 48–51:  version = 0x7 (4 bits)
+     *   - bits 52–63:  seq_hi (12 bits)  ┐ filled deterministically
+     *   - bits 64–65:  variant = 0b10     │ from SHA-1(source:id)
+     *   - bits 66–127: random (62 bits)  ┘
+     */
+    public static UUID uuid7(String source, String id, long timestamp) {
+        byte[] hash = sha1(source + ":" + id);
+
+        // Pack first 8 bytes of hash into a long (gives us 64 bits to draw from)
+        long h = 0;
+        for (int i = 0; i < 8; i++) {
+            h = (h << 8) | (hash[i] & 0xFF);
+        }
+
+        long seq      = (h >>> 52) & 0xFFFL;               // top 12 bits → seq field
+        long random62 =  h         & 0x3FFFFFFFFFFFFFFFL;  // low 62 bits → random field
+
+        long msb = (timestamp << 16) | (0x7L << 12) | seq;
+        long lsb = (0b10L << 62) | random62;
+
+        return new UUID(msb, lsb);
+    }
+
+    private static byte[] sha1(String input) {
+        try {
+            return MessageDigest.getInstance("SHA-1")
+                    .digest(input.getBytes(StandardCharsets.UTF_8));
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-1 not available", e);
+        }
+    }
+}
