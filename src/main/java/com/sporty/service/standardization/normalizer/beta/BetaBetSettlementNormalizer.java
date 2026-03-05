@@ -1,4 +1,4 @@
-package com.sporty.service.standardization.normalizer.alpha;
+package com.sporty.service.standardization.normalizer.beta;
 
 import com.sporty.service.standardization.model.MatchResult;
 import com.sporty.service.standardization.model.NormalizedBetSettlementMessage;
@@ -7,33 +7,35 @@ import com.sporty.service.standardization.normalizer.FeedNormalizer;
 import com.sporty.service.standardization.util.Util;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.Map;
 
 @Component
-public class AlphaBetSettlementNormalizer implements FeedNormalizer {
+public class BetaBetSettlementNormalizer implements FeedNormalizer {
+
+    private static final Map<String, MatchResult> RESULT_MAP = Map.of(
+            "home", MatchResult.HOME,
+            "draw", MatchResult.DRAW,
+            "away", MatchResult.AWAY
+    );
 
     @Override
     public String getSource() {
-        return "alpha";
+        return "beta";
     }
 
     @Override
     public String getRawMessageType() {
-        return "settlement";
+        return "SETTLEMENT";
     }
 
     @Override
     public NormalizedMessage normalize(Map<String, Object> raw) {
         String eventId = Util.requireField(raw, "event_id");
-        String outcome = Util.requireField(raw, "outcome");
+        String result = Util.requireField(raw, "result");
 
-        MatchResult matchResult = Arrays.stream(MatchResult.values())
-                .filter(r -> r.symbol.equals(outcome))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unknown outcome: " + outcome));
+        MatchResult matchResult = RESULT_MAP.get(result);
+        if (matchResult == null) throw new IllegalArgumentException("Unknown result: " + result);
 
-        return new NormalizedBetSettlementMessage("alpha", eventId, matchResult);
+        return new NormalizedBetSettlementMessage("beta", eventId, matchResult);
     }
-
 }

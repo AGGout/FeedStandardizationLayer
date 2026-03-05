@@ -7,7 +7,7 @@ public enum MatchResult {
 
     public final String symbol;
 
-    private MatchResult(String symbol){
+    MatchResult(String symbol) {
         this.symbol = symbol;
     }
 }

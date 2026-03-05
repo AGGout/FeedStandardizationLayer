@@ -20,6 +20,10 @@ public class FeedNormalizerRegistry {
                 ));
     }
 
+    private static String key(String source, String rawMessageType) {
+        return source + ":" + rawMessageType;
+    }
+
     public FeedNormalizer getNormalizer(String source, String rawMessageType) {
         FeedNormalizer normalizer = normalizers.get(key(source, rawMessageType));
         if (normalizer == null) {
@@ -27,9 +31,5 @@ public class FeedNormalizerRegistry {
                     "No normalizer registered for source '%s' and message type '%s'".formatted(source, rawMessageType));
         }
         return normalizer;
-    }
-
-    private static String key(String source, String rawMessageType) {
-        return source + ":" + rawMessageType;
     }
 }
