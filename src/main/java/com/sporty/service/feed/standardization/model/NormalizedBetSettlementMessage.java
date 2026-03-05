@@ -7,7 +7,7 @@ package com.sporty.service.feed.standardization.model;
  */
 public record NormalizedBetSettlementMessage(
         String source,
-        String sourceId,
+        String eventId,
         MatchResult matchResult
 ) implements NormalizedMessage {
 
@@ -15,7 +15,7 @@ public record NormalizedBetSettlementMessage(
     public String getSource() { return source; }
 
     @Override
-    public String getSourceId() { return sourceId; }
+    public String getEventId() { return eventId; }
 
     @Override
     public String getMessageType() { return MessageType.BET_SETTLEMENT.name(); }

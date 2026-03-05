@@ -19,7 +19,7 @@ class AlphaBetSettlementNormalizerTest {
         NormalizedBetSettlementMessage result = (NormalizedBetSettlementMessage) normalizer.normalize(raw);
 
         assertEquals("alpha", result.source());
-        assertEquals("ev123", result.sourceId());
+        assertEquals("ev123", result.eventId());
         assertEquals(MatchResult.DRAW, result.matchResult());
     }
 

@@ -22,7 +22,7 @@ class AlphaOddsChangeNormalizerTest {
         NormalizedOddsChangeMessage result = (NormalizedOddsChangeMessage) normalizer.normalize(raw);
 
         assertEquals("alpha", result.source());
-        assertEquals("ev123", result.sourceId());
+        assertEquals("ev123", result.eventId());
         assertEquals(2.0, result.odds().get("1"));
         assertEquals(3.1, result.odds().get("X"));
         assertEquals(3.8, result.odds().get("2"));

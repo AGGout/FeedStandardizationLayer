@@ -10,5 +10,5 @@ public sealed interface NormalizedMessage
 
     String getMessageType();
     String getSource();
-    String getSourceId();
+    String getEventId();
 }

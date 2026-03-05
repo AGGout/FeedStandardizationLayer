@@ -32,7 +32,7 @@ public class DefaultFeedProcessingService implements FeedProcessingService {
         String rawMessageType = (String) rawMessage.get(registry.getMessageTypeKey(source));
         NormalizedMessage normalized = registry.getNormalizer(source, rawMessageType).normalize(rawMessage);
 
-        String idempotencyKey = Util.uuid7(source, normalized.getSourceId(), timestamp).toString();
+        String idempotencyKey = Util.uuid7(source, normalized.getEventId(), timestamp).toString();
         messenger.send(normalized, Map.of(HEADER_IDEMPOTENCY_KEY, idempotencyKey));
     }
 }

@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
  */
 public record NormalizedOddsChangeMessage(
         String source,
-        String sourceId,
+        String eventId,
         Map<String, Double> odds
 ) implements NormalizedMessage {
 
@@ -19,8 +19,8 @@ public record NormalizedOddsChangeMessage(
      * Convenience factory that accepts odds keyed by {@link MatchResult} and converts
      * them to 1X2 symbols before constructing the record.
      */
-    public static NormalizedOddsChangeMessage from(String source, String sourceId, Map<MatchResult, Double> rawOdds) {
-        return new NormalizedOddsChangeMessage(source, sourceId, rawOdds.entrySet().stream()
+    public static NormalizedOddsChangeMessage from(String source, String eventId, Map<MatchResult, Double> rawOdds) {
+        return new NormalizedOddsChangeMessage(source, eventId, rawOdds.entrySet().stream()
                 .collect(Collectors.toMap(e -> e.getKey().symbol, Map.Entry::getValue)));
     }
 
@@ -28,7 +28,7 @@ public record NormalizedOddsChangeMessage(
     public String getSource() { return source; }
 
     @Override
-    public String getSourceId() { return sourceId; }
+    public String getEventId() { return eventId; }
 
     @Override
     public String getMessageType() { return MessageType.ODDS_CHANGE.name(); }
