@@ -108,6 +108,12 @@ A `@RestControllerAdvice` centralises exception-to-HTTP mapping. Validation fail
 message type, missing fields) return `400 Bad Request` with a descriptive message. Unexpected errors return `500` with a
 generic message to avoid leaking internals.
 
+### 202 Accepted and async status tracking
+
+The endpoints return `202 Accepted` rather than `204 No Content` deliberately. The service accepts the message and hands it off to the broker, but has no way of confirming that downstream consumers have fully processed it. `202` reflects this honestly — the work is not complete from the caller's perspective.
+
+This also opens the door to a full async request-reply pattern. Since a deterministic idempotency UUID is already generated per message, it can be returned to the caller as a correlation ID. A future `GET /status/{id}` endpoint could then allow callers to poll for completion, backed by a status store (e.g. Redis) that the processing pipeline writes to upon success or failure.
+
 ## Scaling
 
 This service is completely stateless — no sessions, no in-memory state, no distributed cache. Every request is
