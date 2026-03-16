@@ -29,16 +29,17 @@ public class AlphaOddsChangeNormalizer implements FeedNormalizer {
     public String getMessageTypeKey() { return "msg_type"; }
 
     @Override
-    @SuppressWarnings("unchecked")
     public NormalizedMessage normalize(Map<String, Object> raw) {
         String eventId = Util.requireField(raw, "event_id");
-        Map<String, Object> values = (Map<String, Object>) raw.get("values");
-        if (values == null) throw new IllegalArgumentException("Missing required field: values");
+        Map<String, Object> values = Util.requireMap(raw, "values");
 
         Map<MatchResult, Double> odds = new EnumMap<>(MatchResult.class);
         for (MatchResult result : MatchResult.values()) {
             Object val = values.get(result.symbol);
             if (val == null) throw new IllegalArgumentException("Missing odds for symbol: " + result.symbol);
+            if (!(val instanceof Number))
+                throw new IllegalArgumentException(
+                        "Odds value for symbol '%s' must be a number but got %s".formatted(result.symbol, val.getClass().getSimpleName()));
             odds.put(result, ((Number) val).doubleValue());
         }
 

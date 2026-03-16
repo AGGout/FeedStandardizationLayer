@@ -54,4 +54,32 @@ class AlphaOddsChangeNormalizerTest {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> normalizer.normalize(raw));
         assertTrue(ex.getMessage().contains("2"));
     }
+
+    @Test
+    void throwsWhenValuesIsNotAMap() {
+        Map<String, Object> raw = Map.of("event_id", "ev123", "values", "not-a-map");
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> normalizer.normalize(raw));
+        assertTrue(ex.getMessage().contains("values"));
+        assertTrue(ex.getMessage().contains("object"));
+    }
+
+    @Test
+    void throwsWhenOddsValueIsNotANumber() {
+        Map<String, Object> values = Map.of("1", "two-point-zero", "X", 3.1, "2", 3.8);
+        Map<String, Object> raw = Map.of("event_id", "ev123", "values", values);
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> normalizer.normalize(raw));
+        assertTrue(ex.getMessage().contains("number"));
+    }
+
+    @Test
+    void throwsWhenEventIdIsBlank() {
+        Map<String, Object> raw = new HashMap<>();
+        raw.put("event_id", "  ");
+        raw.put("values", Map.of("1", 2.0, "X", 3.1, "2", 3.8));
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> normalizer.normalize(raw));
+        assertTrue(ex.getMessage().contains("event_id"));
+    }
 }

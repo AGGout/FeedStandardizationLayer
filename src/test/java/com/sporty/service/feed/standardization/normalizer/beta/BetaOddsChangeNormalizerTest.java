@@ -46,4 +46,32 @@ class BetaOddsChangeNormalizerTest {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> normalizer.normalize(raw));
         assertTrue(ex.getMessage().contains("away"));
     }
+
+    @Test
+    void throwsWhenOddsIsNotAMap() {
+        Map<String, Object> raw = Map.of("event_id", "ev456", "odds", "not-a-map");
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> normalizer.normalize(raw));
+        assertTrue(ex.getMessage().contains("odds"));
+        assertTrue(ex.getMessage().contains("object"));
+    }
+
+    @Test
+    void throwsWhenOddsValueIsNotANumber() {
+        Map<String, Object> odds = Map.of("home", "one-point-nine-five", "draw", 3.2, "away", 4.0);
+        Map<String, Object> raw = Map.of("event_id", "ev456", "odds", odds);
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> normalizer.normalize(raw));
+        assertTrue(ex.getMessage().contains("number"));
+    }
+
+    @Test
+    void throwsWhenEventIdIsBlank() {
+        Map<String, Object> raw = new HashMap<>();
+        raw.put("event_id", "");
+        raw.put("odds", Map.of("home", 1.95, "draw", 3.2, "away", 4.0));
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> normalizer.normalize(raw));
+        assertTrue(ex.getMessage().contains("event_id"));
+    }
 }

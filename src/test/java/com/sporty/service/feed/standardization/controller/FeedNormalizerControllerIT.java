@@ -72,6 +72,15 @@ class FeedNormalizerControllerIT {
     }
 
     @Test
+    void emptyBodyReturns400() throws Exception {
+        mockMvc.perform(post("/provider-alpha/feed")
+                        .contentType(APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("empty")));
+    }
+
+    @Test
     void missingRequiredFieldReturns400() throws Exception {
         String body = """
                 {
