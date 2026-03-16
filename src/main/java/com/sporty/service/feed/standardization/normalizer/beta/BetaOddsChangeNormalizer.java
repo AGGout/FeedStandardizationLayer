@@ -7,7 +7,6 @@ import com.sporty.service.feed.standardization.normalizer.FeedNormalizer;
 import com.sporty.service.feed.standardization.util.Util;
 import org.springframework.stereotype.Component;
 
-import java.util.EnumMap;
 import java.util.Map;
 
 /**
@@ -37,19 +36,7 @@ public class BetaOddsChangeNormalizer implements FeedNormalizer {
     @Override
     public NormalizedMessage normalize(Map<String, Object> raw) {
         String eventId = Util.requireField(raw, "event_id");
-        Map<String, Object> oddsRaw = Util.requireMap(raw, "odds");
-
-        Map<MatchResult, Double> odds = new EnumMap<>(MatchResult.class);
-        for (Map.Entry<String, MatchResult> entry : KEY_MAP.entrySet()) {
-            String key = entry.getKey();
-            Object val = oddsRaw.get(key);
-            if (val == null) throw new IllegalArgumentException("Missing odds for key: " + key);
-            if (!(val instanceof Number))
-                throw new IllegalArgumentException(
-                        "Odds value for key '%s' must be a number but got %s".formatted(key, val.getClass().getSimpleName()));
-            odds.put(entry.getValue(), ((Number) val).doubleValue());
-        }
-
-        return NormalizedOddsChangeMessage.from("beta", eventId, odds);
+        Map<MatchResult, Double> odds = Util.extractOdds(raw, "odds", KEY_MAP);
+        return NormalizedOddsChangeMessage.from(getSource(), eventId, odds);
     }
 }

@@ -11,16 +11,15 @@ import java.util.Map;
 
 /**
  * Normalizes bet settlement messages from provider Beta ({@code type: "SETTLEMENT"}).
- * Expects a {@code result} field with a word value ({@code "home"}, {@code "draw"}, {@code "away"}),
- * which is mapped to the canonical 1X2 symbol via {@link com.sporty.service.feed.standardization.model.MatchResult#fromSymbol}.
+ * Expects a {@code result} field with a word value ({@code "home"}, {@code "draw"}, {@code "away"}).
  */
 @Component
 public class BetaBetSettlementNormalizer implements FeedNormalizer {
 
-    private static final Map<String, String> RESULT_TO_SYMBOL = Map.of(
-            "home", MatchResult.HOME.symbol,
-            "draw", MatchResult.DRAW.symbol,
-            "away", MatchResult.AWAY.symbol
+    private static final Map<String, MatchResult> RESULT_TO_MATCH_RESULT = Map.of(
+            "home", MatchResult.HOME,
+            "draw", MatchResult.DRAW,
+            "away", MatchResult.AWAY
     );
 
     @Override
@@ -37,9 +36,9 @@ public class BetaBetSettlementNormalizer implements FeedNormalizer {
         String eventId = Util.requireField(raw, "event_id");
         String result = Util.requireField(raw, "result");
 
-        String symbol = RESULT_TO_SYMBOL.get(result);
-        if (symbol == null) throw new IllegalArgumentException("Unknown result: " + result);
+        MatchResult matchResult = RESULT_TO_MATCH_RESULT.get(result);
+        if (matchResult == null) throw new IllegalArgumentException("Unknown result: " + result);
 
-        return new NormalizedBetSettlementMessage("beta", eventId, MatchResult.fromSymbol(symbol));
+        return new NormalizedBetSettlementMessage(getSource(), eventId, matchResult);
     }
 }

@@ -7,7 +7,6 @@ import com.sporty.service.feed.standardization.normalizer.FeedNormalizer;
 import com.sporty.service.feed.standardization.util.Util;
 import org.springframework.stereotype.Component;
 
-import java.util.EnumMap;
 import java.util.Map;
 
 /**
@@ -17,10 +16,14 @@ import java.util.Map;
 @Component
 public class AlphaOddsChangeNormalizer implements FeedNormalizer {
 
+    private static final Map<String, MatchResult> KEY_MAP = Map.of(
+            "1", MatchResult.HOME,
+            "X", MatchResult.DRAW,
+            "2", MatchResult.AWAY
+    );
+
     @Override
-    public String getSource() {
-        return "alpha";
-    }
+    public String getSource() { return "alpha"; }
 
     @Override
     public String getRawMessageType() { return "odds_update"; }
@@ -31,18 +34,7 @@ public class AlphaOddsChangeNormalizer implements FeedNormalizer {
     @Override
     public NormalizedMessage normalize(Map<String, Object> raw) {
         String eventId = Util.requireField(raw, "event_id");
-        Map<String, Object> values = Util.requireMap(raw, "values");
-
-        Map<MatchResult, Double> odds = new EnumMap<>(MatchResult.class);
-        for (MatchResult result : MatchResult.values()) {
-            Object val = values.get(result.symbol);
-            if (val == null) throw new IllegalArgumentException("Missing odds for symbol: " + result.symbol);
-            if (!(val instanceof Number))
-                throw new IllegalArgumentException(
-                        "Odds value for symbol '%s' must be a number but got %s".formatted(result.symbol, val.getClass().getSimpleName()));
-            odds.put(result, ((Number) val).doubleValue());
-        }
-
-        return NormalizedOddsChangeMessage.from("alpha", eventId, odds);
+        Map<MatchResult, Double> odds = Util.extractOdds(raw, "values", KEY_MAP);
+        return NormalizedOddsChangeMessage.from(getSource(), eventId, odds);
     }
 }

@@ -29,6 +29,6 @@ public class AlphaBetSettlementNormalizer implements FeedNormalizer {
     public NormalizedMessage normalize(Map<String, Object> raw) {
         String eventId = Util.requireField(raw, "event_id");
         String outcome = Util.requireField(raw, "outcome");
-        return new NormalizedBetSettlementMessage("alpha", eventId, MatchResult.fromSymbol(outcome));
+        return new NormalizedBetSettlementMessage(getSource(), eventId, MatchResult.fromSymbol(outcome));
     }
 }

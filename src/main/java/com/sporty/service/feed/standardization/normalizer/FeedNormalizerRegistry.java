@@ -23,14 +23,21 @@ public class FeedNormalizerRegistry {
     private final Map<String, String> messageTypeKeys;
 
     public FeedNormalizerRegistry(List<FeedNormalizer> normalizers) {
-        this.normalizers = normalizers.stream()
+        this.normalizers = buildNormalizerIndex(normalizers);
+        this.messageTypeKeys = buildMessageTypeKeyIndex(normalizers);
+    }
+
+    private static Map<String, FeedNormalizer> buildNormalizerIndex(List<FeedNormalizer> normalizers) {
+        return normalizers.stream()
                 .collect(Collectors.toMap(
                         n -> key(n.getSource(), n.getRawMessageType()),
                         Function.identity()
                 ));
+    }
 
+    private static Map<String, String> buildMessageTypeKeyIndex(List<FeedNormalizer> normalizers) {
         // One message type key per source — fail fast if a source has conflicting keys
-        this.messageTypeKeys = normalizers.stream()
+        return normalizers.stream()
                 .collect(Collectors.toMap(
                         FeedNormalizer::getSource,
                         FeedNormalizer::getMessageTypeKey,

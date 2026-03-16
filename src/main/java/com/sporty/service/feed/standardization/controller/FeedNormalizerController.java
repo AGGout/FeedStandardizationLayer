@@ -32,10 +32,7 @@ public class FeedNormalizerController {
      */
     @PostMapping("/provider-alpha/feed")
     public ResponseEntity<Void> alphaFeed(@RequestBody Map<String, Object> rawMessage) {
-        if (rawMessage == null || rawMessage.isEmpty())
-            throw new IllegalArgumentException("Request body must not be empty");
-        processingService.process("alpha", rawMessage, Instant.now().toEpochMilli());
-        return ResponseEntity.accepted().build();
+        return handleFeed("alpha", rawMessage);
     }
 
     /**
@@ -46,9 +43,13 @@ public class FeedNormalizerController {
      */
     @PostMapping("/provider-beta/feed")
     public ResponseEntity<Void> betaFeed(@RequestBody Map<String, Object> rawMessage) {
+        return handleFeed("beta", rawMessage);
+    }
+
+    private ResponseEntity<Void> handleFeed(String source, Map<String, Object> rawMessage) {
         if (rawMessage == null || rawMessage.isEmpty())
             throw new IllegalArgumentException("Request body must not be empty");
-        processingService.process("beta", rawMessage, Instant.now().toEpochMilli());
+        processingService.process(source, rawMessage, Instant.now().toEpochMilli());
         return ResponseEntity.accepted().build();
     }
 }
