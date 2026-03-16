@@ -18,6 +18,9 @@ import java.util.Map;
 @RestController
 public class FeedNormalizerController {
 
+    private static final String SOURCE_ALPHA = "alpha";
+    private static final String SOURCE_BETA = "beta";
+
     private final FeedProcessingService processingService;
 
     public FeedNormalizerController(FeedProcessingService processingService) {
@@ -32,7 +35,7 @@ public class FeedNormalizerController {
      */
     @PostMapping("/provider-alpha/feed")
     public ResponseEntity<Void> alphaFeed(@RequestBody Map<String, Object> rawMessage) {
-        return handleFeed("alpha", rawMessage);
+        return handleFeed(SOURCE_ALPHA, rawMessage);
     }
 
     /**
@@ -43,7 +46,7 @@ public class FeedNormalizerController {
      */
     @PostMapping("/provider-beta/feed")
     public ResponseEntity<Void> betaFeed(@RequestBody Map<String, Object> rawMessage) {
-        return handleFeed("beta", rawMessage);
+        return handleFeed(SOURCE_BETA, rawMessage);
     }
 
     private ResponseEntity<Void> handleFeed(String source, Map<String, Object> rawMessage) {

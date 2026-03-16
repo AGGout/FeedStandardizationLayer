@@ -43,32 +43,32 @@ class UtilTest {
     }
 
     @Test
-    void requireFieldReturnsValueWhenPresent() {
+    void requireStringFieldReturnsValueWhenPresent() {
         Map<String, Object> raw = Map.of("key", "value");
-        assertEquals("value", Util.requireField(raw, "key"));
+        assertEquals("value", Util.requireStringField(raw, "key"));
     }
 
     @Test
-    void requireFieldThrowsWhenAbsent() {
+    void requireStringFieldThrowsWhenAbsent() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> Util.requireField(Map.of(), "missingKey"));
+                () -> Util.requireStringField(Map.of(), "missingKey"));
         assertTrue(ex.getMessage().contains("missingKey"));
     }
 
     @Test
-    void requireFieldThrowsWhenBlank() {
+    void requireStringFieldThrowsWhenBlank() {
         Map<String, Object> raw = new java.util.HashMap<>();
         raw.put("key", "   ");
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> Util.requireField(raw, "key"));
+                () -> Util.requireStringField(raw, "key"));
         assertTrue(ex.getMessage().contains("key"));
     }
 
     @Test
-    void requireFieldThrowsWhenWrongType() {
+    void requireStringFieldThrowsWhenWrongType() {
         Map<String, Object> raw = Map.of("key", 42);
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> Util.requireField(raw, "key"));
+                () -> Util.requireStringField(raw, "key"));
         assertTrue(ex.getMessage().contains("key"));
         assertTrue(ex.getMessage().contains("string"));
     }

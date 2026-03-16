@@ -12,11 +12,5 @@ public record NormalizedBetSettlementMessage(
 ) implements NormalizedMessage {
 
     @Override
-    public String getSource() { return source; }
-
-    @Override
-    public String getEventId() { return eventId; }
-
-    @Override
-    public String getMessageType() { return MessageType.BET_SETTLEMENT.name(); }
+    public MessageType getMessageType() { return MessageType.BET_SETTLEMENT; }
 }

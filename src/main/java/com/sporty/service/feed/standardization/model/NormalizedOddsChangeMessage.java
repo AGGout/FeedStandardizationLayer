@@ -21,15 +21,9 @@ public record NormalizedOddsChangeMessage(
      */
     public static NormalizedOddsChangeMessage from(String source, String eventId, Map<MatchResult, Double> rawOdds) {
         return new NormalizedOddsChangeMessage(source, eventId, rawOdds.entrySet().stream()
-                .collect(Collectors.toMap(e -> e.getKey().symbol, Map.Entry::getValue)));
+                .collect(Collectors.toMap(e -> e.getKey().symbol(), Map.Entry::getValue)));
     }
 
     @Override
-    public String getSource() { return source; }
-
-    @Override
-    public String getEventId() { return eventId; }
-
-    @Override
-    public String getMessageType() { return MessageType.ODDS_CHANGE.name(); }
+    public MessageType getMessageType() { return MessageType.ODDS_CHANGE; }
 }

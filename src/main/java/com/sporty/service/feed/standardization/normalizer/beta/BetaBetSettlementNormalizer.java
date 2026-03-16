@@ -16,7 +16,7 @@ import java.util.Map;
 @Component
 public class BetaBetSettlementNormalizer implements FeedNormalizer {
 
-    private static final Map<String, MatchResult> RESULT_TO_MATCH_RESULT = Map.of(
+    private static final Map<String, MatchResult> KEY_MAP = Map.of(
             "home", MatchResult.HOME,
             "draw", MatchResult.DRAW,
             "away", MatchResult.AWAY
@@ -33,10 +33,10 @@ public class BetaBetSettlementNormalizer implements FeedNormalizer {
 
     @Override
     public NormalizedMessage normalize(Map<String, Object> raw) {
-        String eventId = Util.requireField(raw, "event_id");
-        String result = Util.requireField(raw, "result");
+        String eventId = Util.requireStringField(raw, "event_id");
+        String result = Util.requireStringField(raw, "result");
 
-        MatchResult matchResult = RESULT_TO_MATCH_RESULT.get(result);
+        MatchResult matchResult = KEY_MAP.get(result);
         if (matchResult == null) throw new IllegalArgumentException("Unknown result: " + result);
 
         return new NormalizedBetSettlementMessage(getSource(), eventId, matchResult);

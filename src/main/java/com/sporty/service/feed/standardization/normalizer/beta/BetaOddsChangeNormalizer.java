@@ -4,6 +4,7 @@ import com.sporty.service.feed.standardization.model.MatchResult;
 import com.sporty.service.feed.standardization.model.NormalizedMessage;
 import com.sporty.service.feed.standardization.model.NormalizedOddsChangeMessage;
 import com.sporty.service.feed.standardization.normalizer.FeedNormalizer;
+import com.sporty.service.feed.standardization.normalizer.OddsExtractor;
 import com.sporty.service.feed.standardization.util.Util;
 import org.springframework.stereotype.Component;
 
@@ -35,8 +36,8 @@ public class BetaOddsChangeNormalizer implements FeedNormalizer {
 
     @Override
     public NormalizedMessage normalize(Map<String, Object> raw) {
-        String eventId = Util.requireField(raw, "event_id");
-        Map<MatchResult, Double> odds = Util.extractOdds(raw, "odds", KEY_MAP);
+        String eventId = Util.requireStringField(raw, "event_id");
+        Map<MatchResult, Double> odds = OddsExtractor.extractOdds(raw, "odds", KEY_MAP);
         return NormalizedOddsChangeMessage.from(getSource(), eventId, odds);
     }
 }
