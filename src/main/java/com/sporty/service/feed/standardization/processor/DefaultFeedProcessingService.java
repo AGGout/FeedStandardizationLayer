@@ -29,7 +29,13 @@ public class DefaultFeedProcessingService implements FeedProcessingService {
 
     @Override
     public void process(String source, Map<String, Object> rawMessage, long timestamp) {
-        String rawMessageType = (String) rawMessage.get(registry.getMessageTypeKey(source));
+        if (source == null || source.isBlank())
+            throw new IllegalArgumentException("source must not be blank");
+        if (rawMessage == null || rawMessage.isEmpty())
+            throw new IllegalArgumentException("rawMessage must not be null or empty");
+
+        String typeKey = registry.getMessageTypeKey(source);
+        String rawMessageType = Util.requireField(rawMessage, typeKey);
         NormalizedMessage normalized = registry.getNormalizer(source, rawMessageType).normalize(rawMessage);
 
         String idempotencyKey = Util.uuid7(source, normalized.getEventId(), timestamp).toString();

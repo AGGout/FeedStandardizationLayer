@@ -44,17 +44,40 @@ public final class Util {
     }
 
     /**
-     * Extracts a mandatory String field from a raw message map.
+     * Extracts a mandatory, non-blank String field from a raw message map.
      *
      * @param raw   the raw message map
      * @param field the field name to look up
      * @return the field value
-     * @throws IllegalArgumentException if the field is absent
+     * @throws IllegalArgumentException if the field is absent, blank, or not a String
      */
     public static String requireField(Map<String, Object> raw, String field) {
         Object value = raw.get(field);
         if (value == null) throw new IllegalArgumentException("Missing required field: " + field);
-        return (String) value;
+        if (!(value instanceof String str))
+            throw new IllegalArgumentException(
+                    "Field '%s' must be a string but got %s".formatted(field, value.getClass().getSimpleName()));
+        if (str.isBlank())
+            throw new IllegalArgumentException("Field '%s' must not be blank".formatted(field));
+        return str;
+    }
+
+    /**
+     * Extracts a mandatory nested object field from a raw message map.
+     *
+     * @param raw   the raw message map
+     * @param field the field name to look up
+     * @return the nested map
+     * @throws IllegalArgumentException if the field is absent or not a Map
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> requireMap(Map<String, Object> raw, String field) {
+        Object value = raw.get(field);
+        if (value == null) throw new IllegalArgumentException("Missing required field: " + field);
+        if (!(value instanceof Map))
+            throw new IllegalArgumentException(
+                    "Field '%s' must be an object but got %s".formatted(field, value.getClass().getSimpleName()));
+        return (Map<String, Object>) value;
     }
 
     private static byte[] sha1(String input) {

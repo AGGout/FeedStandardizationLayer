@@ -30,8 +30,11 @@ public enum MatchResult {
      * @throws IllegalArgumentException if the symbol is not recognised
      */
     public static MatchResult fromSymbol(String symbol) {
+        if (symbol == null) throw new IllegalArgumentException("symbol must not be null");
         MatchResult result = BY_SYMBOL.get(symbol);
-        if (result == null) throw new IllegalArgumentException("Unknown symbol: " + symbol);
+        if (result == null)
+            throw new IllegalArgumentException(
+                    "Unknown symbol: '%s'. Expected one of: %s".formatted(symbol, BY_SYMBOL.keySet()));
         return result;
     }
 }

@@ -35,18 +35,20 @@ public class BetaOddsChangeNormalizer implements FeedNormalizer {
     public String getMessageTypeKey() { return "type"; }
 
     @Override
-    @SuppressWarnings("unchecked")
     public NormalizedMessage normalize(Map<String, Object> raw) {
         String eventId = Util.requireField(raw, "event_id");
-        Map<String, Object> oddsRaw = (Map<String, Object>) raw.get("odds");
-        if (oddsRaw == null) throw new IllegalArgumentException("Missing required field: odds");
+        Map<String, Object> oddsRaw = Util.requireMap(raw, "odds");
 
         Map<MatchResult, Double> odds = new EnumMap<>(MatchResult.class);
-        KEY_MAP.forEach((key, result) -> {
+        for (Map.Entry<String, MatchResult> entry : KEY_MAP.entrySet()) {
+            String key = entry.getKey();
             Object val = oddsRaw.get(key);
             if (val == null) throw new IllegalArgumentException("Missing odds for key: " + key);
-            odds.put(result, ((Number) val).doubleValue());
-        });
+            if (!(val instanceof Number))
+                throw new IllegalArgumentException(
+                        "Odds value for key '%s' must be a number but got %s".formatted(key, val.getClass().getSimpleName()));
+            odds.put(entry.getValue(), ((Number) val).doubleValue());
+        }
 
         return NormalizedOddsChangeMessage.from("beta", eventId, odds);
     }

@@ -50,6 +50,8 @@ public class FeedNormalizerRegistry {
      * @throws IllegalArgumentException if no normalizer is registered for the combination
      */
     public FeedNormalizer getNormalizer(String source, String rawMessageType) {
+        if (source == null) throw new IllegalArgumentException("source must not be null");
+        if (rawMessageType == null) throw new IllegalArgumentException("rawMessageType must not be null");
         FeedNormalizer normalizer = normalizers.get(key(source, rawMessageType));
         if (normalizer == null) {
             throw new IllegalArgumentException(
@@ -64,6 +66,7 @@ public class FeedNormalizerRegistry {
      * @throws IllegalArgumentException if no normalizer is registered for the source
      */
     public String getMessageTypeKey(String source) {
+        if (source == null) throw new IllegalArgumentException("source must not be null");
         String key = messageTypeKeys.get(source);
         if (key == null) {
             throw new IllegalArgumentException("No normalizer registered for source: " + source);
