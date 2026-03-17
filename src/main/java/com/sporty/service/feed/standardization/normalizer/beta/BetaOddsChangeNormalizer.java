@@ -1,5 +1,6 @@
 package com.sporty.service.feed.standardization.normalizer.beta;
 
+import com.sporty.service.feed.standardization.model.FeedProvider;
 import com.sporty.service.feed.standardization.model.MatchResult;
 import com.sporty.service.feed.standardization.model.NormalizedMessage;
 import com.sporty.service.feed.standardization.model.NormalizedOddsChangeMessage;
@@ -25,7 +26,7 @@ public class BetaOddsChangeNormalizer implements FeedNormalizer {
 
     @Override
     public String getSource() {
-        return "beta";
+        return FeedProvider.BETA.getId();
     }
 
     @Override

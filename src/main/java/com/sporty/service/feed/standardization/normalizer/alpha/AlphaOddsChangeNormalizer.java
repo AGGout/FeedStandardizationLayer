@@ -1,5 +1,6 @@
 package com.sporty.service.feed.standardization.normalizer.alpha;
 
+import com.sporty.service.feed.standardization.model.FeedProvider;
 import com.sporty.service.feed.standardization.model.MatchResult;
 import com.sporty.service.feed.standardization.model.NormalizedMessage;
 import com.sporty.service.feed.standardization.model.NormalizedOddsChangeMessage;
@@ -24,7 +25,7 @@ public class AlphaOddsChangeNormalizer implements FeedNormalizer {
     );
 
     @Override
-    public String getSource() { return "alpha"; }
+    public String getSource() { return FeedProvider.ALPHA.getId(); }
 
     @Override
     public String getRawMessageType() { return "odds_update"; }

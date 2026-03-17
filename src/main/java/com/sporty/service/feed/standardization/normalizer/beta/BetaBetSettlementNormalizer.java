@@ -1,5 +1,6 @@
 package com.sporty.service.feed.standardization.normalizer.beta;
 
+import com.sporty.service.feed.standardization.model.FeedProvider;
 import com.sporty.service.feed.standardization.model.MatchResult;
 import com.sporty.service.feed.standardization.model.NormalizedBetSettlementMessage;
 import com.sporty.service.feed.standardization.model.NormalizedMessage;
@@ -23,7 +24,7 @@ public class BetaBetSettlementNormalizer implements FeedNormalizer {
     );
 
     @Override
-    public String getSource() { return "beta"; }
+    public String getSource() { return FeedProvider.BETA.getId(); }
 
     @Override
     public String getRawMessageType() { return "SETTLEMENT"; }

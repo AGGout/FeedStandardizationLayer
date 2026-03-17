@@ -1,5 +1,6 @@
 package com.sporty.service.feed.standardization.controller;
 
+import com.sporty.service.feed.standardization.model.FeedProvider;
 import com.sporty.service.feed.standardization.processor.FeedProcessingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,9 +19,6 @@ import java.util.Map;
 @RestController
 public class FeedNormalizerController {
 
-    private static final String SOURCE_ALPHA = "alpha";
-    private static final String SOURCE_BETA = "beta";
-
     private final FeedProcessingService processingService;
 
     public FeedNormalizerController(FeedProcessingService processingService) {
@@ -35,7 +33,7 @@ public class FeedNormalizerController {
      */
     @PostMapping("/provider-alpha/feed")
     public ResponseEntity<Void> alphaFeed(@RequestBody Map<String, Object> rawMessage) {
-        return handleFeed(SOURCE_ALPHA, rawMessage);
+        return handleFeed(FeedProvider.ALPHA.getId(), rawMessage);
     }
 
     /**
@@ -46,7 +44,7 @@ public class FeedNormalizerController {
      */
     @PostMapping("/provider-beta/feed")
     public ResponseEntity<Void> betaFeed(@RequestBody Map<String, Object> rawMessage) {
-        return handleFeed(SOURCE_BETA, rawMessage);
+        return handleFeed(FeedProvider.BETA.getId(), rawMessage);
     }
 
     private ResponseEntity<Void> handleFeed(String source, Map<String, Object> rawMessage) {
