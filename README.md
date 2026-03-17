@@ -104,9 +104,20 @@ produces the same UUID, allowing downstream consumers to deduplicate safely.
 
 ### Error handling
 
-A `@RestControllerAdvice` centralises exception-to-HTTP mapping. Validation failures (unknown provider, unrecognised
-message type, missing fields) return `400 Bad Request` with a descriptive message. Unexpected errors return `500` with a
-generic message to avoid leaking internals.
+A `@RestControllerAdvice` centralises exception-to-HTTP mapping. Unexpected errors return `500` with a generic message
+to avoid leaking internals. All validation failures return `400 Bad Request` with a specific message describing the
+problem. Validated conditions include:
+
+| Condition                  | Example error message                                                    |
+|----------------------------|--------------------------------------------------------------------------|
+| Empty request body         | `Request body must not be empty`                                         |
+| Missing required field     | `Missing required field: event_id`                                       |
+| Field present but blank    | `Field 'event_id' must not be blank`                                     |
+| Field is the wrong type    | `Field 'values' must be an object but got String`                        |
+| Non-numeric odds value     | `Odds value for key 'home' must be a number but got String`              |
+| Missing odds entry         | `Missing odds for key: draw`                                             |
+| Unrecognised message type  | `No normalizer registered for source 'alpha' and message type 'unknown'` |
+| Unknown settlement outcome | `Unknown symbol: 'Z'. Expected one of: [1, X, 2]`                        |
 
 ### 202 Accepted and async status tracking
 
@@ -280,7 +291,6 @@ helped with:
 - **Advice** — asked advice related to observability and tracing.
 - **Debugging** — identifying issues such as mismatched `getRawMessageType()` values, and Java record constructor
   ambiguity due to type erasure.
-- **Refactoring** — moving & renaming, extracting.
 - **Documentation** — structuring and improving README sections on production considerations (Protobuf, GC,
   partitioning, security).
 
