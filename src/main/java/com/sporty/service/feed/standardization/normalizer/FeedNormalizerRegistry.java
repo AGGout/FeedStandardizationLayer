@@ -23,14 +23,21 @@ public class FeedNormalizerRegistry {
     private final Map<String, String> messageTypeKeys;
 
     public FeedNormalizerRegistry(List<FeedNormalizer> normalizers) {
-        this.normalizers = normalizers.stream()
+        this.normalizers = buildNormalizerIndex(normalizers);
+        this.messageTypeKeys = buildMessageTypeKeyIndex(normalizers);
+    }
+
+    private static Map<String, FeedNormalizer> buildNormalizerIndex(List<FeedNormalizer> normalizers) {
+        return normalizers.stream()
                 .collect(Collectors.toMap(
                         n -> key(n.getSource(), n.getRawMessageType()),
                         Function.identity()
                 ));
+    }
 
+    private static Map<String, String> buildMessageTypeKeyIndex(List<FeedNormalizer> normalizers) {
         // One message type key per source — fail fast if a source has conflicting keys
-        this.messageTypeKeys = normalizers.stream()
+        return normalizers.stream()
                 .collect(Collectors.toMap(
                         FeedNormalizer::getSource,
                         FeedNormalizer::getMessageTypeKey,
@@ -50,6 +57,8 @@ public class FeedNormalizerRegistry {
      * @throws IllegalArgumentException if no normalizer is registered for the combination
      */
     public FeedNormalizer getNormalizer(String source, String rawMessageType) {
+        if (source == null) throw new IllegalArgumentException("source must not be null");
+        if (rawMessageType == null) throw new IllegalArgumentException("rawMessageType must not be null");
         FeedNormalizer normalizer = normalizers.get(key(source, rawMessageType));
         if (normalizer == null) {
             throw new IllegalArgumentException(
@@ -64,6 +73,7 @@ public class FeedNormalizerRegistry {
      * @throws IllegalArgumentException if no normalizer is registered for the source
      */
     public String getMessageTypeKey(String source) {
+        if (source == null) throw new IllegalArgumentException("source must not be null");
         String key = messageTypeKeys.get(source);
         if (key == null) {
             throw new IllegalArgumentException("No normalizer registered for source: " + source);

@@ -1,13 +1,14 @@
 package com.sporty.service.feed.standardization.normalizer.alpha;
 
+import com.sporty.service.feed.standardization.model.FeedProvider;
 import com.sporty.service.feed.standardization.model.MatchResult;
 import com.sporty.service.feed.standardization.model.NormalizedMessage;
 import com.sporty.service.feed.standardization.model.NormalizedOddsChangeMessage;
 import com.sporty.service.feed.standardization.normalizer.FeedNormalizer;
+import com.sporty.service.feed.standardization.normalizer.OddsExtractor;
 import com.sporty.service.feed.standardization.util.Util;
 import org.springframework.stereotype.Component;
 
-import java.util.EnumMap;
 import java.util.Map;
 
 /**
@@ -17,10 +18,14 @@ import java.util.Map;
 @Component
 public class AlphaOddsChangeNormalizer implements FeedNormalizer {
 
+    private static final Map<String, MatchResult> KEY_MAP = Map.of(
+            "1", MatchResult.HOME,
+            "X", MatchResult.DRAW,
+            "2", MatchResult.AWAY
+    );
+
     @Override
-    public String getSource() {
-        return "alpha";
-    }
+    public String getSource() { return FeedProvider.ALPHA.getId(); }
 
     @Override
     public String getRawMessageType() { return "odds_update"; }
@@ -29,19 +34,9 @@ public class AlphaOddsChangeNormalizer implements FeedNormalizer {
     public String getMessageTypeKey() { return "msg_type"; }
 
     @Override
-    @SuppressWarnings("unchecked")
     public NormalizedMessage normalize(Map<String, Object> raw) {
-        String eventId = Util.requireField(raw, "event_id");
-        Map<String, Object> values = (Map<String, Object>) raw.get("values");
-        if (values == null) throw new IllegalArgumentException("Missing required field: values");
-
-        Map<MatchResult, Double> odds = new EnumMap<>(MatchResult.class);
-        for (MatchResult result : MatchResult.values()) {
-            Object val = values.get(result.symbol);
-            if (val == null) throw new IllegalArgumentException("Missing odds for symbol: " + result.symbol);
-            odds.put(result, ((Number) val).doubleValue());
-        }
-
-        return NormalizedOddsChangeMessage.from("alpha", eventId, odds);
+        String eventId = Util.requireStringField(raw, "event_id");
+        Map<MatchResult, Double> odds = OddsExtractor.extractOdds(raw, "values", KEY_MAP);
+        return NormalizedOddsChangeMessage.from(getSource(), eventId, odds);
     }
 }

@@ -8,7 +8,7 @@ package com.sporty.service.feed.standardization.model;
 public sealed interface NormalizedMessage
         permits NormalizedOddsChangeMessage, NormalizedBetSettlementMessage {
 
-    String getMessageType();
-    String getSource();
-    String getEventId();
+    MessageType getMessageType();
+    String source();
+    String eventId();
 }

@@ -1,5 +1,6 @@
 package com.sporty.service.feed.standardization.normalizer.alpha;
 
+import com.sporty.service.feed.standardization.model.FeedProvider;
 import com.sporty.service.feed.standardization.model.MatchResult;
 import com.sporty.service.feed.standardization.model.NormalizedBetSettlementMessage;
 import com.sporty.service.feed.standardization.model.NormalizedMessage;
@@ -17,7 +18,7 @@ import java.util.Map;
 public class AlphaBetSettlementNormalizer implements FeedNormalizer {
 
     @Override
-    public String getSource() { return "alpha"; }
+    public String getSource() { return FeedProvider.ALPHA.getId(); }
 
     @Override
     public String getRawMessageType() { return "settlement"; }
@@ -27,8 +28,8 @@ public class AlphaBetSettlementNormalizer implements FeedNormalizer {
 
     @Override
     public NormalizedMessage normalize(Map<String, Object> raw) {
-        String eventId = Util.requireField(raw, "event_id");
-        String outcome = Util.requireField(raw, "outcome");
-        return new NormalizedBetSettlementMessage("alpha", eventId, MatchResult.fromSymbol(outcome));
+        String eventId = Util.requireStringField(raw, "event_id");
+        String outcome = Util.requireStringField(raw, "outcome");
+        return new NormalizedBetSettlementMessage(getSource(), eventId, MatchResult.fromSymbol(outcome));
     }
 }
